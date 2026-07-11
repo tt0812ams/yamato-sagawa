@@ -37,8 +37,8 @@
       manualNumberEl.textContent = raw || '(指定なし)';
       fallbackEl.style.display = 'block';
 
-      // 佐川の送り状番号は10桁または12桁の半角数字
-      if (digitsOnly.length !== 10 && digitsOnly.length !== 12) {
+      // 桁数は呼び出し元（メール生成スクリプト）側で整形される想定のため、緩めのチェックのみ行う
+      if (digitsOnly.length < 8 || digitsOnly.length > 14) {
         statusEl.textContent = '送り状番号が正しく指定されていません（自動入力をスキップしました）。';
         return;
       }
