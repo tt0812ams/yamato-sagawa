@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>佐川急便 荷物問い合わせへ移動中...</title>
+<style>
+  body { font-family: Meiryo, sans-serif; padding: 2em; line-height: 1.8; }
+  #fallback { display: none; margin-top: 1em; }
+</style>
+</head>
+<body>
+  <p id="status">送り状番号を入力して、佐川急便の問い合わせページへ移動しています…</p>
+
+  <!-- https://www.sagawa-exp.co.jp/howto-search/ に埋め込まれている
+       「お荷物問い合わせ」クイック検索フォームと同じ仕組み（隠しトークン不要）。 -->
+  <form id="relay-form" method="post" action="https://k2k.sagawa-exp.co.jp/p/web/okurijosearch.do" style="display:none;">
+    <input type="hidden" name="okurijoNo" id="okurijoNo">
+  </form>
+
+  <p id="fallback">
+    自動的に移動しない場合は、こちらをクリックしてください。<br>
+    <a id="manual-link" href="https://k2k.sagawa-exp.co.jp/p/sagawa/web/okurijoinput.jsp" target="_blank">
+      佐川急便 荷物問い合わせページを開く
+    </a>
+    （送り状番号: <span id="manual-number"></span> は自動入力されないので手動でご入力ください）
+  </p>
+
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var raw = (params.get('number') || '').trim();
+      var digitsOnly = raw.replace(/[^0-9]/g, '');
+      var statusEl = document.getElementById('status');
+      var fallbackEl = document.getElementById('fallback');
+      var manualNumberEl = document.getElementById('manual-number');
+
+      manualNumberEl.textContent = raw || '(指定なし)';
+      fallbackEl.style.display = 'block';
+
+      // 佐川の送り状番号は10桁または12桁の半角数字
+      if (digitsOnly.length !== 10 && digitsOnly.length !== 12) {
+        statusEl.textContent = '送り状番号が正しく指定されていません（自動入力をスキップしました）。';
+        return;
+      }
+
+      document.getElementById('okurijoNo').value = digitsOnly;
+      document.getElementById('relay-form').submit();
+    })();
+  </script>
+</body>
+</html>
